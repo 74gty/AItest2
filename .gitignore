@@ -1,0 +1,10 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 本地虚拟环境
+venv/
+.venv/
+
+# 运行输出截图
+result.png
