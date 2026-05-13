@@ -108,11 +108,11 @@ allure --version
 
 ## Jenkins 自动化执行
 
-启动 Jenkins：
+启动 Jenkins。推荐镜像中预装 Python、Git、Allure 插件；如果使用自定义镜像，确保容器内可以执行 `python3`、`git` 和 `pip`：
 
 ```bash
 docker pull jenkins/jenkins:lts
-docker run -d --name jenkins -p 8080:8080 -p 50000:50000 --add-host=host.docker.internal:host-gateway -v jenkins_home:/var/jenkins_home -v /home/master/projects/selenium:/workspace/selenium jenkins-python:local
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 --add-host=host.docker.internal:host-gateway -v jenkins_home:/var/jenkins_home jenkins-python:local
 ```
 
 查看初始管理员密码：
@@ -127,27 +127,47 @@ docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 http://localhost:8080
 ```
 
-初始化后安装建议插件。当前项目还没有接 Git 时，按下面方式创建任务：
+初始化后安装建议插件，并确保安装 Pipeline、Git、Allure 相关插件。
+
+创建一键自动化流水线：
 
 ```text
 New Item
-输入任务名，例如 selenium-gitea-ui
+输入任务名，例如 eutl-ci
 选择 Pipeline
-Pipeline 区域选择 Pipeline script
-复制 Jenkinsfile 全部内容并粘贴进去
+Pipeline 区域选择 Pipeline script from SCM
+SCM 选择 Git
+Repository URL 填写仓库地址，例如：
+  GitHub: https://github.com/74gty/AItest2.git
+  Gitee: git@gitee.com:jkiyi/ai-test-1.git
+Branch Specifier 填写 */main
+Script Path 填写 Jenkinsfile
 Save
 Build Now
 ```
 
-当前 Jenkins 容器已挂载本项目：
+流水线默认参数 `TEST_SCOPE=all-stable`，点击 `Build Now` 就会自动完成：
 
 ```text
-/home/master/projects/selenium -> /workspace/selenium
+拉取仓库代码
+创建 Python 虚拟环境
+安装 requirements.txt
+运行 pytest 稳定回归
+生成 reports/ Allure 原始结果
+归档 reports/**
 ```
 
-所以 Jenkinsfile 会直接运行 `/workspace/selenium` 里的代码。
+可选测试范围：
 
-Jenkins 容器内访问宿主机端口时使用 `host.docker.internal`，所以流水线会连接：
+```text
+all-stable   默认稳定回归，不强依赖浏览器、Gitea、SuiteCRM 账号
+findata      只运行 EUTL 金融行情数据聚合与风险监控测试平台
+gitea-ui     运行 Gitea UI 测试，需要 Selenium Chrome 与 Gitea 服务
+suitecrm-ui  运行 SuiteCRM UI 测试，需要 Selenium Chrome 与 SuiteCRM Web
+suitecrm-api 运行 SuiteCRM API 测试，需要 SuiteCRM API 与 OAuth 配置
+```
+
+Jenkins 容器内访问宿主机端口时使用 `host.docker.internal`，所以 UI 测试参数默认会连接：
 
 ```text
 http://host.docker.internal:4444/wd/hub
