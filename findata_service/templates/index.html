@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>EUTL 金融行情数据聚合与风险监控测试平台</title>
+  <style>
+    body { font-family: Arial, "Microsoft YaHei", sans-serif; margin: 32px; line-height: 1.6; color: #202124; }
+    h1 { margin-bottom: 4px; }
+    h2 { margin-top: 28px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    h3 { margin-bottom: 8px; }
+    a { color: #0b57d0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: #f5f5f5; padding: 2px 5px; border-radius: 4px; }
+    .desc { color: #5f6368; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+    .card { border: 1px solid #ddd; border-radius: 6px; padding: 12px 14px; }
+    .method { font-weight: bold; color: #137333; }
+    .mode { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+    .mode a { border: 1px solid #dadce0; border-radius: 6px; padding: 8px 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border: 1px solid #e0e0e0; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #f8fafd; }
+  </style>
+</head>
+<body>
+  <h1>EUTL 金融行情数据聚合与风险监控测试平台</h1>
+  <p class="desc">当前为 Mock 稳定模式，适合本地体验和自动化测试；不涉及真实交易、下单、证券账户或资金划转。</p>
+
+  <h2>数据模式</h2>
+  <p>默认使用 Mock 样本数据，保证本地测试和 Jenkins 回归稳定。需要体验真实公开数据时，可以点带 <code>mode=live</code> 的链接；真实数据依赖 AKShare/BaoStock 和网络可用性，失败时会按缓存/备用源/统一错误结构处理。</p>
+  <div class="mode">
+    <a href="/api/stock/realtime?symbol=600519&mode=mock">稳定 Mock 查询</a>
+    <a href="/api/stock/realtime?symbol=600519&mode=live">真实数据查询</a>
+  </div>
+
+  <h2>直接查看数据</h2>
+  <div class="grid">
+    <div class="card">
+      <div><span class="method">GET</span> 股票实时行情</div>
+      <a href="/api/stock/realtime?symbol=600519">/api/stock/realtime?symbol=600519</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 股票历史行情</div>
+      <a href="/api/stock/history?symbol=600519&start_date=20240101&end_date=20241231">/api/stock/history?symbol=600519&start_date=20240101&end_date=20241231</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 指数历史行情</div>
+      <a href="/api/index/history?symbol=sh000300&start_date=20240101&end_date=20241231">/api/index/history?symbol=sh000300&start_date=20240101&end_date=20241231</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 交易日历</div>
+      <a href="/api/trade/calendar?start_date=20240510&end_date=20240512">/api/trade/calendar?start_date=20240510&end_date=20240512</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 基金基本信息</div>
+      <a href="/api/fund/basic?fund_code=000001">/api/fund/basic?fund_code=000001</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 基金净值</div>
+      <a href="/api/fund/nav?fund_code=000001">/api/fund/nav?fund_code=000001</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 基金历史净值</div>
+      <a href="/api/fund/history?fund_code=000001&start_date=20240101&end_date=20241231">/api/fund/history?fund_code=000001&start_date=20240101&end_date=20241231</a>
+    </div>
+    <div class="card">
+      <div><span class="method">GET</span> 风险提醒</div>
+      <a href="/api/risk/alerts">/api/risk/alerts</a>
+    </div>
+  </div>
+
+  <h2>字段说明</h2>
+  <h3>常用入参</h3>
+  <table>
+    <tr><th>字段名</th><th>中文含义</th><th>示例</th></tr>
+    <tr><td><code>symbol</code></td><td>股票或指数代码。A 股股票常用 6 位数字；指数示例带 sh/sz 前缀。</td><td><code>600519</code>、<code>000001</code>、<code>sh000300</code></td></tr>
+    <tr><td><code>fund_code</code></td><td>基金代码，通常是 6 位数字。</td><td><code>000001</code>、<code>110022</code></td></tr>
+    <tr><td><code>start_date</code></td><td>查询开始日期，格式为 yyyyMMdd。</td><td><code>20240101</code></td></tr>
+    <tr><td><code>end_date</code></td><td>查询结束日期，格式为 yyyyMMdd，不能早于开始日期。</td><td><code>20241231</code></td></tr>
+    <tr><td><code>mode</code></td><td>数据模式。<code>mock</code> 是稳定样本；<code>live</code> 是真实公开数据查询。</td><td><code>mock</code>、<code>live</code></td></tr>
+  </table>
+
+  <h3>常用返回字段</h3>
+  <table>
+    <tr><th>字段名</th><th>中文含义</th></tr>
+    <tr><td><code>success</code></td><td>接口是否成功返回业务结果。</td></tr>
+    <tr><td><code>data</code></td><td>接口返回的业务数据主体。</td></tr>
+    <tr><td><code>name</code></td><td>股票、基金或指数名称。</td></tr>
+    <tr><td><code>price</code></td><td>股票当前价格。</td></tr>
+    <tr><td><code>change_pct</code></td><td>涨跌幅百分比。</td></tr>
+    <tr><td><code>nav</code></td><td>基金单位净值。</td></tr>
+    <tr><td><code>nav_date</code></td><td>基金净值对应日期。</td></tr>
+    <tr><td><code>items</code></td><td>历史行情、历史净值或交易日历的列表数据。</td></tr>
+    <tr><td><code>source</code></td><td>数据来源：<code>mock</code>、<code>akshare</code>、<code>baostock</code> 或 <code>cache</code>。</td></tr>
+    <tr><td><code>risk_type</code></td><td>风险类型，例如跌幅、净值未更新、异常波动等。</td></tr>
+  </table>
+
+  <h2>Try it out 是什么</h2>
+  <p><code>Try it out</code> 是 Swagger 文档里的“手动发起一次接口请求”。点 <code>Execute</code> 后，结果会显示在同一个接口块下面的 <code>Response body</code> 区域。</p>
+
+  <h2>需要提交数据的接口</h2>
+  <p>自选关注和模拟持仓需要 POST，建议在接口文档页面点击“Try it out”体验。</p>
+  <ul>
+    <li>接口文档：<a href="/docs">/docs</a></li>
+    <li>健康检查：<a href="/api/health">/api/health</a></li>
+    <li>自选列表：<a href="/api/watchlist">/api/watchlist</a></li>
+    <li>组合汇总：<a href="/api/portfolio/summary">/api/portfolio/summary</a></li>
+  </ul>
+</body>
+</html>

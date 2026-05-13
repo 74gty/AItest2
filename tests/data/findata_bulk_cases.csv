@@ -1,0 +1,13 @@
+case_id,operation,item_type,symbol,start_date,end_date,expected_success,expected_code
+stock_realtime_600519,stock_realtime,stock,600519,,,true,
+stock_realtime_000001,stock_realtime,stock,000001,,,true,
+stock_realtime_missing,stock_realtime,stock,999999,,,false,DATA_NOT_FOUND
+stock_realtime_empty,stock_realtime,stock,,,,false,INVALID_SYMBOL
+stock_history_600519,stock_history,stock,600519,20240101,20241231,true,
+stock_history_bad_range,stock_history,stock,600519,20241231,20240101,false,INVALID_DATE_RANGE
+index_history_hs300,index_history,index,sh000300,20240101,20241231,true,
+index_history_bad_symbol,index_history,index,000300,20240101,20241231,false,INVALID_SYMBOL
+fund_basic_000001,fund_basic,fund,000001,,,true,
+fund_basic_missing,fund_basic,fund,999999,,,false,DATA_NOT_FOUND
+fund_nav_110022,fund_nav,fund,110022,,,true,
+fund_history_000001,fund_history,fund,000001,20240101,20241231,true,

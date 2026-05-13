@@ -1,0 +1,13 @@
+base_url: "https://the-internet.herokuapp.com"
+gitea_url: "http://host.docker.internal:3000"
+gitea_username: ""
+gitea_password: ""
+remote_url: "http://localhost:4444/wd/hub"
+browser: "chrome"
+
+suitecrm_url: "http://host.docker.internal:8081"
+suitecrm_api_url: "http://localhost:8081/Api"
+suitecrm_username: ""
+suitecrm_password: ""
+suitecrm_client_id: ""
+suitecrm_client_secret: ""
