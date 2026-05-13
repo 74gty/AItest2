@@ -9,6 +9,11 @@ venv/
 # 本地命令行工具
 .tools/
 
+# 本地助手配置（保留在本机，不上传仓库）
+.claude/
+AGENTS.md
+CLAUDE.md
+
 # 运行输出截图
 result.png
 
