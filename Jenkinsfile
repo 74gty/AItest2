@@ -8,13 +8,11 @@ pipeline {
     parameters {
         choice(
             name: 'TEST_SCOPE',
-            choices: ['all-stable', 'findata', 'gitea-ui', 'suitecrm-ui', 'suitecrm-api'],
-            description: '选择本次流水线要执行的测试范围。默认 all-stable 不依赖外部账号和浏览器，会跳过需手动启用的 UI/API 用例。'
+            choices: ['all-stable', 'findata-api', 'findata-db', 'findata-ui', 'findata-all'],
+            description: '选择金融平台测试范围。默认 all-stable 不强制依赖浏览器。'
         )
         string(name: 'REMOTE_URL', defaultValue: 'http://host.docker.internal:4444/wd/hub', description: 'Selenium Remote WebDriver 地址')
-        string(name: 'GITEA_URL', defaultValue: 'http://host.docker.internal:3000', description: 'Gitea 被测服务地址')
-        string(name: 'SUITECRM_URL', defaultValue: 'http://host.docker.internal:8081', description: 'SuiteCRM Web 地址')
-        string(name: 'SUITECRM_API_URL', defaultValue: 'http://host.docker.internal:8081/Api', description: 'SuiteCRM API 地址')
+        string(name: 'FINDATA_URL', defaultValue: 'http://host.docker.internal:8010', description: '金融平台 Web 地址')
     }
 
     environment {
@@ -49,24 +47,25 @@ pipeline {
 
                     case "$TEST_SCOPE" in
                         all-stable)
-                            pytest -v
+                            pytest tests/test_config.py \
+                                tests/test_findata_api.py \
+                                tests/test_findata_service.py \
+                                tests/test_findata_bulk_cases.py \
+                                tests/test_findata_market_samples.py -v
                             ;;
-                        findata)
+                        findata-api)
+                            pytest tests/test_findata_api.py tests/test_findata_db_api.py -v
+                            ;;
+                        findata-db)
+                            pytest tests/test_findata_mysql.py tests/test_findata_db_api.py -v
+                            ;;
+                        findata-ui)
+                            pytest tests/test_findata_ui.py -v --run-ui \
+                                --remote-url "$REMOTE_URL" \
+                                --findata-url "$FINDATA_URL"
+                            ;;
+                        findata-all)
                             pytest -m findata -v
-                            ;;
-                        gitea-ui)
-                            pytest tests/test_gitea.py -v --run-ui \
-                                --remote-url "$REMOTE_URL" \
-                                --gitea-url "$GITEA_URL"
-                            ;;
-                        suitecrm-ui)
-                            pytest automation-scripts/suitecrm/tests -v --run-suitecrm-ui \
-                                --remote-url "$REMOTE_URL" \
-                                --suitecrm-url "$SUITECRM_URL"
-                            ;;
-                        suitecrm-api)
-                            pytest automation-scripts/suitecrm/tests -v --run-suitecrm-api \
-                                --suitecrm-api-url "$SUITECRM_API_URL"
                             ;;
                         *)
                             echo "Unsupported TEST_SCOPE: $TEST_SCOPE"

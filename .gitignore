@@ -14,6 +14,10 @@ venv/
 AGENTS.md
 CLAUDE.md
 
+# 本地个人记录文档（公开仓库只保留 README.md）
+README.personal.md
+*.personal.md
+
 # 运行输出截图
 result.png
 
