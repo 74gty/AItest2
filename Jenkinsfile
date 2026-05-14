@@ -51,7 +51,8 @@ pipeline {
                                 tests/test_findata_api.py \
                                 tests/test_findata_service.py \
                                 tests/test_findata_bulk_cases.py \
-                                tests/test_findata_market_samples.py -v
+                                tests/test_findata_market_samples.py \
+                                automation-scripts/suitecrm/tests/test_suitecrm_test_design.py -v
                             ;;
                         findata-api)
                             pytest tests/test_findata_api.py tests/test_findata_db_api.py -v

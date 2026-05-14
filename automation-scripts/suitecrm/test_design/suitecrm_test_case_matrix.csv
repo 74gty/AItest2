@@ -1,0 +1,13 @@
+module,feature,total_cases,covered_cases,methods,priority
+Login,valid login and invalid login,20,20,"equivalence;boundary;scenario",P0
+Login,logout and session timeout,14,13,"scenario;boundary",P0
+Dashboard,menu visibility and dashboard widgets,16,16,"scenario;equivalence",P1
+Accounts,account create and edit,24,24,"equivalence;boundary;scenario",P0
+Accounts,account search filter pagination,18,18,"equivalence;boundary",P0
+Contacts,contact create edit and account relation,21,20,"scenario;equivalence",P0
+Leads,lead status flow and conversion precheck,19,18,"scenario;state-transition",P0
+Opportunities,sales opportunity amount stage and date,17,16,"boundary;scenario",P1
+Activities,task calendar event create and reminder,16,15,"scenario;boundary",P1
+API Auth,oauth token success failure and refresh,14,14,"equivalence;scenario",P0
+API Records,json api schema crud and error code,20,20,"equivalence;boundary;scenario",P0
+Permission,role menu data scope readonly checks,19,18,"scenario;equivalence",P0

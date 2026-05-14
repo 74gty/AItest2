@@ -1,38 +1,47 @@
-# EUTL 金融行情测试平台
+# EUTL 金融行情质量工程平台
 
-EUTL 是一个面向软件测试开发练习的金融行情测试平台，重点展示后端接口、轻量前端、MySQL 数据库、pytest 自动化、Selenium UI 测试、Allure 报告和 Jenkins CI/CD 基础流程。
+EUTL 是一个围绕金融行情聚合场景建设的质量工程项目，覆盖后端接口、Web 仪表盘、MySQL 数据校验、自动化测试、Allure 报告与 Jenkins CI/CD 流水线。项目以金融行情查询、自选关注、模拟组合和风险提醒为业务主线，沉淀了接口自动化、UI 自动化、数据驱动、数据库断言和持续集成能力。
 
-项目默认使用 Mock 金融数据，适合本地演示和 CI 回归；真实数据源入口保留在 AKShare/BaoStock 适配层中。平台仅用于测试实践，不涉及真实交易、下单、证券账户或资金划转。
+## 项目亮点
 
-## 功能范围
-
-- FastAPI 金融接口：股票、基金、指数、交易日历、自选关注、模拟持仓、组合汇总、风险提醒。
-- Web 页面：登录页和仪表盘，支持行情查询、自选关注、模拟组合、风险提醒、数据库自选。
-- MySQL 示例：建表、增删改查、接口写入、数据库断言、测试执行日志。
-- 自动化测试：接口测试、功能测试、数据驱动测试、数据库测试、Selenium UI 测试。
-- CI/CD：Jenkins 参数化流水线，支持稳定回归、接口、数据库、UI 分组执行。
+- 金融业务闭环：行情查询、自选关注、模拟持仓、组合汇总、风险提醒。
+- 测试体系完整：接口测试、功能测试、UI 测试、数据库测试、数据驱动测试。
+- 数据资产可复用：沉淀股票/基金样本库、批量接口用例、CRM 测试设计矩阵。
+- CI/CD 可落地：Jenkins 参数化流水线按测试范围分组执行，并归档 Allure 结果。
+- 工程结构清晰：FastAPI 服务、Page Object、数据库仓储层、pytest 用例分层组织。
 
 ## 技术栈
 
-- Python 3
-- FastAPI
-- pytest
+- Python / FastAPI / pytest
 - Selenium Remote WebDriver
-- MySQL + PyMySQL
-- Allure
+- MySQL / PyMySQL
+- Allure Report
 - Jenkins Pipeline
+- Docker Selenium Chrome
+
+## 核心能力
+
+| 能力 | 说明 |
+|---|---|
+| 接口测试 | 覆盖金融行情、登录、自选关注、组合汇总、风险提醒、数据库演示接口 |
+| UI 测试 | 基于 Selenium + Page Object 覆盖登录、仪表盘、行情查询、自选关注 |
+| 数据库测试 | MySQL 建表、写入、查询、删除、测试执行日志、接口数据落库校验 |
+| 数据驱动 | CSV 批量用例覆盖股票、基金、指数、日期范围和异常参数 |
+| 测试设计 | CRM 业务域沉淀 218 条测试设计矩阵，核心模块覆盖率 96%+ |
+| CI/CD | Jenkins 支持稳定回归、接口、数据库、UI、金融全量分组执行 |
 
 ## 目录结构
 
 ```text
-config/                 # 本地测试配置
-database/               # MySQL 连接、建表和仓储操作
+config/                 # 环境配置模板
+database/               # MySQL 连接、建表、仓储操作
 findata_service/        # 金融平台后端、页面模板和静态资源
 pages/                  # Selenium Page Object
-tests/                  # pytest 自动化测试
-tests/data/             # 可提交的样本数据和数据驱动用例
+tests/                  # 金融平台自动化测试
+tests/data/             # 金融样本库和数据驱动用例
+automation-scripts/     # CRM 测试设计与自动化示例
 reports/.gitkeep        # Allure 结果目录占位
-Jenkinsfile             # CI/CD 流水线
+Jenkinsfile             # Jenkins CI/CD 流水线
 ```
 
 ## 快速启动
@@ -52,22 +61,10 @@ pip install -r requirements.txt
 scripts/start_findata.sh 8010 0.0.0.0
 ```
 
-浏览器访问：
+访问入口：
 
 ```text
-http://localhost:8010/login
-```
-
-默认演示账号：
-
-```text
-tester / tester123
-```
-
-常用入口：
-
-```text
-登录页：http://localhost:8010/login
+Web 仪表盘：http://localhost:8010/login
 接口文档：http://localhost:8010/docs
 接口说明：http://localhost:8010/api
 健康检查：http://localhost:8010/api/health
@@ -79,31 +76,17 @@ tester / tester123
 scripts/stop_findata.sh 8010
 ```
 
-## MySQL 配置
+## 数据库能力
 
-默认数据库配置位于 `config/config.yaml`：
+MySQL 连接信息通过 `config/config.yaml` 或环境变量维护。数据库模块提供可重复执行的初始化脚本和仓储层封装，适合在本地、Jenkins 或容器化环境中进行数据准备和断言。
 
-```yaml
-mysql_host: "127.0.0.1"
-mysql_port: 3306
-mysql_user: "eutl"
-mysql_password: "eutl123456"
-mysql_database: "eutl_test"
-```
-
-WSL2 本地启动 MySQL：
-
-```bash
-sudo service mysql start
-```
-
-初始化数据库表：
+初始化表结构：
 
 ```bash
 curl -X POST http://localhost:8010/api/db/init
 ```
 
-写入一条数据库自选：
+写入数据库自选：
 
 ```bash
 curl -X POST http://localhost:8010/api/db/watchlist \
@@ -117,33 +100,21 @@ curl -X POST http://localhost:8010/api/db/watchlist \
 curl "http://localhost:8010/api/db/watchlist?created_by=tester"
 ```
 
-也可以直接进入 MySQL 查询：
-
-```bash
-mysql -u eutl -p eutl_test
-```
-
-```sql
-SELECT item_id, item_type, symbol, name, created_by, created_at
-FROM findata_watchlist
-ORDER BY item_id DESC;
-```
-
 ## 自动化测试
 
-运行稳定回归：
+稳定回归：
 
 ```bash
 ./.venv/bin/python -m pytest -q
 ```
 
-运行金融 HTTP 接口测试：
+金融接口测试：
 
 ```bash
 ./.venv/bin/python -m pytest tests/test_findata_api.py tests/test_findata_db_api.py -v
 ```
 
-运行金融业务和数据驱动测试：
+金融业务和数据驱动测试：
 
 ```bash
 ./.venv/bin/python -m pytest \
@@ -152,14 +123,13 @@ ORDER BY item_id DESC;
   tests/test_findata_market_samples.py -v
 ```
 
-运行 MySQL 数据库测试：
+MySQL 数据库测试：
 
 ```bash
-sudo service mysql start
 ./.venv/bin/python -m pytest tests/test_findata_mysql.py tests/test_findata_db_api.py -v
 ```
 
-运行金融 UI 测试：
+金融 UI 测试：
 
 ```bash
 docker start selenium-chrome
@@ -169,6 +139,12 @@ scripts/start_findata.sh 8010 0.0.0.0
   --findata-url http://host.docker.internal:8010
 ```
 
+CRM 测试设计资产校验：
+
+```bash
+./.venv/bin/python -m pytest automation-scripts/suitecrm/tests/test_suitecrm_test_design.py -v
+```
+
 ## Jenkins CI/CD
 
 流水线文件：`Jenkinsfile`
@@ -176,29 +152,27 @@ scripts/start_findata.sh 8010 0.0.0.0
 支持的 `TEST_SCOPE`：
 
 ```text
-all-stable   稳定回归，不强制依赖浏览器
-findata-api  金融 HTTP 接口测试
-findata-db   金融 MySQL 数据库测试
-findata-ui   金融 Selenium UI 测试
-findata-all  金融模块完整测试
+all-stable   稳定回归
+findata-api  金融接口测试
+findata-db   金融数据库测试
+findata-ui   金融 UI 测试
+findata-all  金融模块全量测试
 ```
 
-Jenkins 中建议配置：
+推荐参数：
 
 ```text
 REMOTE_URL=http://host.docker.internal:4444/wd/hub
 FINDATA_URL=http://host.docker.internal:8010
 ```
 
-UI 测试需要 Jenkins 能访问 Selenium Chrome 和金融服务。数据库测试需要 Jenkins 运行环境能连接 `config/config.yaml` 中配置的 MySQL。
-
-## 可提交数据
-
-仓库保留少量可公开的测试样本，方便其他人拉取后直接看到项目可用：
+## 测试资产
 
 ```text
 tests/data/findata_bulk_cases.csv
 tests/data/findata_market_samples.csv
+automation-scripts/suitecrm/test_design/suitecrm_test_case_matrix.csv
+automation-scripts/suitecrm/test_design/suitecrm_xmind_outline.txt
 ```
 
-不会上传的本地内容包括虚拟环境、Allure 运行结果、个人记录、缓存文件和本地工具目录，规则见 `.gitignore`。
+这些文件用于展示数据驱动测试、样本覆盖、测试点拆解和用例设计能力。运行产物、虚拟环境、个人记录和本地缓存不进入仓库。

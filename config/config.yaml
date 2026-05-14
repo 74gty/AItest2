@@ -7,7 +7,7 @@ browser: "chrome"
 
 findata_url: "http://host.docker.internal:8010"
 findata_username: "tester"
-findata_password: "tester123"
+findata_password: ""
 findata_session_token: "findata-demo-session"
 
 suitecrm_url: "http://host.docker.internal:8081"
@@ -20,6 +20,5 @@ suitecrm_client_secret: ""
 mysql_host: "127.0.0.1"
 mysql_port: 3306
 mysql_user: "eutl"
-mysql_password: "eutl123456"
+mysql_password: ""
 mysql_database: "eutl_test"
-

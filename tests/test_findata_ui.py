@@ -25,7 +25,7 @@ def test_findata_ui_login_and_dashboard(driver, test_config):
         # 金融平台服务需先启动，未启动时跳过 UI 用例并保留清晰原因
         pytest.skip(f"无法访问金融数据平台：{error.msg}")
 
-    page.login(test_config["findata_username"], test_config["findata_password"])
+    page.login(test_config.get("findata_username") or "tester", test_config.get("findata_password") or "tester123")
     page.wait_for_dashboard()
 
     assert "金融行情数据聚合与风险监控" in driver.page_source
@@ -40,7 +40,7 @@ def test_findata_ui_quote_and_watchlist(driver, test_config):
     except WebDriverException as error:
         pytest.skip(f"无法访问金融数据平台：{error.msg}")
 
-    page.login(test_config["findata_username"], test_config["findata_password"])
+    page.login(test_config.get("findata_username") or "tester", test_config.get("findata_password") or "tester123")
     page.wait_for_dashboard()
 
     quote_result = page.query_stock("600519")
