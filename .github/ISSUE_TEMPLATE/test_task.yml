@@ -1,0 +1,35 @@
+name: 测试任务
+description: 记录测试设计、执行、回归和验收任务
+title: "[TEST][模块] 测试任务描述"
+labels: ["test"]
+body:
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 测试范围
+      options:
+        - 接口测试
+        - UI 测试
+        - 数据库测试
+        - 数据驱动测试
+        - 回归测试
+        - 测试设计
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: 目标
+      placeholder: "说明本次测试要验证的业务目标和质量风险"
+    validations:
+      required: true
+  - type: textarea
+    id: cases
+    attributes:
+      label: 覆盖用例
+      placeholder: "列出关联用例文件、用例编号或测试点"
+  - type: textarea
+    id: result
+    attributes:
+      label: 执行结果
+      placeholder: "通过数、失败数、Actions Run、Allure artifact 等"

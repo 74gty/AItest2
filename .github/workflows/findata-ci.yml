@@ -1,0 +1,132 @@
+name: Findata Quality Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: "Select test scope"
+        required: true
+        default: "all-stable"
+        type: choice
+        options:
+          - all-stable
+          - findata-api
+          - findata-db
+          - findata-ui
+          - findata-all
+
+jobs:
+  findata-quality:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: eutl_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+      selenium:
+        image: selenium/standalone-chrome:latest
+        ports:
+          - 4444:4444
+
+    env:
+      FINDATA_USERNAME: tester
+      FINDATA_PASSWORD: tester123
+      FINDATA_SESSION_TOKEN: findata-demo-session
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_USER: eutl
+      MYSQL_PASSWORD: eutl123456
+      MYSQL_DATABASE: eutl_test
+      REMOTE_URL: http://127.0.0.1:4444/wd/hub
+      FINDATA_URL: http://127.0.0.1:8010
+      TEST_SCOPE: ${{ github.event.inputs.test_scope || 'all-stable' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install system tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Prepare MySQL user
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE USER IF NOT EXISTS 'eutl'@'%' IDENTIFIED BY 'eutl123456';"
+          mysql -h 127.0.0.1 -uroot -proot -e "GRANT ALL PRIVILEGES ON eutl_test.* TO 'eutl'@'%';"
+          mysql -h 127.0.0.1 -uroot -proot -e "FLUSH PRIVILEGES;"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+
+      - name: Start Findata service for UI scope
+        if: ${{ env.TEST_SCOPE == 'findata-ui' || env.TEST_SCOPE == 'findata-all' }}
+        run: |
+          python -m uvicorn findata_service.app:app --host 0.0.0.0 --port 8010 &
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:8010/api/health && exit 0
+            sleep 1
+          done
+          exit 1
+
+      - name: Run selected tests
+        run: |
+          case "$TEST_SCOPE" in
+            all-stable)
+              pytest tests/test_config.py \
+                tests/test_findata_api.py \
+                tests/test_findata_service.py \
+                tests/test_findata_bulk_cases.py \
+                tests/test_findata_market_samples.py \
+                automation-scripts/suitecrm/tests/test_suitecrm_test_design.py -v
+              ;;
+            findata-api)
+              pytest tests/test_findata_api.py tests/test_findata_db_api.py -v
+              ;;
+            findata-db)
+              pytest tests/test_findata_mysql.py tests/test_findata_db_api.py -v
+              ;;
+            findata-ui)
+              pytest tests/test_findata_ui.py -v --run-ui \
+                --remote-url "$REMOTE_URL" \
+                --findata-url "$FINDATA_URL"
+              ;;
+            findata-all)
+              pytest -m findata -v --run-ui \
+                --remote-url "$REMOTE_URL" \
+                --findata-url "$FINDATA_URL"
+              ;;
+            *)
+              echo "Unsupported TEST_SCOPE: $TEST_SCOPE"
+              exit 2
+              ;;
+          esac
+
+      - name: Upload Allure raw results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ env.TEST_SCOPE }}
+          path: reports/
+          if-no-files-found: ignore
