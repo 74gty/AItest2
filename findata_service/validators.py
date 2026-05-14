@@ -5,7 +5,7 @@ from findata_service.errors import FindataError
 
 def validate_symbol(symbol, field_name="symbol"):
     if not symbol or not str(symbol).strip():
-        raise FindataError("INVALID_SYMBOL", f"{field_name} 不能为空")
+        raise FindataError("INVALID_SYMBOL", f"{field_name} 不能为空，请传入有效代码，例如 600519")
     return str(symbol).strip()
 
 

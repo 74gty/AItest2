@@ -31,6 +31,16 @@ def test_findata_stock_realtime_api(client):
     assert body["data"]["source"] == "mock"
 
 
+def test_findata_stock_realtime_api_rejects_empty_symbol(client):
+    response = client.get("/api/stock/realtime")
+    body = response.json()
+
+    assert response.status_code == 400
+    assert body["success"] is False
+    assert body["error"]["code"] == "INVALID_SYMBOL"
+    assert "例如 600519" in body["error"]["message"]
+
+
 def test_findata_watchlist_api_crud(client):
     create_response = client.post(
         "/api/watchlist",
