@@ -230,14 +230,19 @@ automation-scripts/suitecrm/
 - 股票行情、历史 K 线、指数行情、交易日历接口
 - 基金基本信息、净值、历史净值接口
 - 自选关注、模拟持仓、组合汇总、风险提醒接口
+- 轻量登录页与仪表盘页面，用于金融平台 UI 自动化测试
+- MySQL 测试数据库演示接口，用于展示建表、增删改查和数据库断言
 - 统一业务错误结构
 
 服务目录：
 
 ```text
+database/             # MySQL 连接、建表、仓储操作
 findata_service/
   app.py          # FastAPI 路由入口
-  templates/      # 中文首页说明，可直接修改 index.html
+  auth.py         # 金融平台演示登录认证
+  templates/      # 登录页、仪表盘、接口说明页
+  static/         # 金融平台前端 CSS/JS
   service.py      # 自选、组合、风险等业务逻辑
   factory.py      # Mock/真实数据源模式选择
   data_sources.py # Mock / AKShare / BaoStock 数据源适配
@@ -269,6 +274,24 @@ scripts/stop_findata.sh 8010
 curl http://localhost:8010/api/health
 ```
 
+访问金融平台前端：
+
+```text
+http://localhost:8010/login
+```
+
+默认演示账号来自 `config/config.yaml`：
+
+```text
+tester / tester123
+```
+
+MySQL 测试数据库配置同样来自 `config/config.yaml`，默认连接 WSL2 本机：
+
+```text
+127.0.0.1:3306 / eutl_test
+```
+
 示例接口：
 
 ```bash
@@ -280,13 +303,52 @@ curl "http://localhost:8010/api/fund/nav?fund_code=000001"
 curl "http://localhost:8010/api/fund/history?fund_code=000001&start_date=20240101&end_date=20241231"
 ```
 
+MySQL 数据库演示接口：
+
+```bash
+curl -X POST http://localhost:8010/api/db/init
+curl -X POST http://localhost:8010/api/db/watchlist \
+  -H "Content-Type: application/json" \
+  -d '{"item_type":"stock","symbol":"600519","name":"贵州茅台","created_by":"tester"}'
+curl "http://localhost:8010/api/db/watchlist?created_by=tester"
+```
+
 中文首页说明文件：
 
 ```text
 findata_service/templates/index.html
 ```
 
-如果只是想改首页里“字段说明”“Try it out 是什么”“示例参数”等中文文案，直接改这个文件即可。
+接口说明页现在位于：
+
+```text
+http://localhost:8010/api
+```
+
+如果只是想改说明页里“字段说明”“Try it out 是什么”“示例参数”等中文文案，直接改 `findata_service/templates/index.html` 即可。
+
+运行金融 HTTP 接口测试：
+
+```bash
+./.venv/bin/python -m pytest tests/test_findata_api.py -v
+```
+
+运行金融 MySQL 数据库测试：
+
+```bash
+sudo service mysql start
+./.venv/bin/python -m pytest tests/test_findata_mysql.py tests/test_findata_db_api.py -v
+```
+
+运行金融 UI 测试前，请先启动金融服务和 Docker Chrome：
+
+```bash
+scripts/start_findata.sh 8010 0.0.0.0
+docker start selenium-chrome
+./.venv/bin/python -m pytest tests/test_findata_ui.py -v --run-ui \
+  --remote-url http://localhost:4444/wd/hub \
+  --findata-url http://host.docker.internal:8010
+```
 
 运行当前 Mock 回归测试：
 

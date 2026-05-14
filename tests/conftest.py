@@ -13,6 +13,9 @@ def pytest_addoption(parser):
     parser.addoption("--gitea-url", default=None, help="Gitea 被测服务地址")
     parser.addoption("--gitea-username", default=None, help="Gitea 登录用户名")
     parser.addoption("--gitea-password", default=None, help="Gitea 登录密码")
+    parser.addoption("--findata-url", default=None, help="金融数据平台 Web 地址")
+    parser.addoption("--findata-username", default=None, help="金融数据平台登录用户名")
+    parser.addoption("--findata-password", default=None, help="金融数据平台登录密码")
 
 
 @pytest.fixture(scope="session")
@@ -23,6 +26,9 @@ def test_config(pytestconfig):
     gitea_url = pytestconfig.getoption("--gitea-url")
     gitea_username = pytestconfig.getoption("--gitea-username")
     gitea_password = pytestconfig.getoption("--gitea-password")
+    findata_url = pytestconfig.getoption("--findata-url")
+    findata_username = pytestconfig.getoption("--findata-username")
+    findata_password = pytestconfig.getoption("--findata-password")
 
     if remote_url:
         config["remote_url"] = remote_url
@@ -34,6 +40,12 @@ def test_config(pytestconfig):
         config["gitea_username"] = gitea_username
     if gitea_password:
         config["gitea_password"] = gitea_password
+    if findata_url:
+        config["findata_url"] = findata_url
+    if findata_username:
+        config["findata_username"] = findata_username
+    if findata_password:
+        config["findata_password"] = findata_password
 
     return config
 

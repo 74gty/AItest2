@@ -5,9 +5,21 @@ gitea_password: ""
 remote_url: "http://localhost:4444/wd/hub"
 browser: "chrome"
 
+findata_url: "http://host.docker.internal:8010"
+findata_username: "tester"
+findata_password: "tester123"
+findata_session_token: "findata-demo-session"
+
 suitecrm_url: "http://host.docker.internal:8081"
 suitecrm_api_url: "http://localhost:8081/Api"
 suitecrm_username: ""
 suitecrm_password: ""
 suitecrm_client_id: ""
 suitecrm_client_secret: ""
+
+mysql_host: "127.0.0.1"
+mysql_port: 3306
+mysql_user: "eutl"
+mysql_password: "eutl123456"
+mysql_database: "eutl_test"
+

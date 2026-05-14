@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EUTL 金融平台仪表盘</title>
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">EUTL Findata</p>
+      <h1>金融行情数据聚合与风险监控</h1>
+    </div>
+    <nav class="top-actions">
+      <a href="/docs">接口文档</a>
+      <button id="logout-button" type="button">退出</button>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+    <section class="metric-grid" aria-label="平台概览">
+      <article class="metric">
+        <span>服务状态</span>
+        <strong id="health-status">-</strong>
+      </article>
+      <article class="metric">
+        <span>自选关注</span>
+        <strong id="watchlist-count">0</strong>
+      </article>
+      <article class="metric">
+        <span>组合市值</span>
+        <strong id="market-value">0</strong>
+      </article>
+      <article class="metric">
+        <span>风险提醒</span>
+        <strong id="risk-count">0</strong>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>行情查询</h2>
+          <span class="badge">Mock</span>
+        </div>
+        <form id="quote-form" class="inline-form">
+          <input id="quote-symbol" name="symbol" value="600519" aria-label="股票代码" />
+          <button type="submit">查询</button>
+        </form>
+        <pre id="quote-result" class="result-box"></pre>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>自选关注</h2>
+          <span class="badge">Watchlist</span>
+        </div>
+        <form id="watchlist-form" class="inline-form">
+          <select id="watchlist-type" aria-label="关注类型">
+            <option value="stock">股票</option>
+            <option value="fund">基金</option>
+          </select>
+          <input id="watchlist-symbol" value="600519" aria-label="关注代码" />
+          <input id="watchlist-name" value="贵州茅台" aria-label="关注名称" />
+          <button type="submit">新增</button>
+        </form>
+        <ul id="watchlist-items" class="data-list"></ul>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>模拟组合</h2>
+          <span class="badge">Portfolio</span>
+        </div>
+        <form id="holding-form" class="inline-form">
+          <select id="holding-type" aria-label="持仓类型">
+            <option value="stock">股票</option>
+            <option value="fund">基金</option>
+          </select>
+          <input id="holding-symbol" value="600519" aria-label="持仓代码" />
+          <input id="holding-quantity" value="2" type="number" min="0.01" step="0.01" aria-label="数量" />
+          <input id="holding-cost" value="1600" type="number" min="0.01" step="0.01" aria-label="成本价" />
+          <button type="submit">加入</button>
+        </form>
+        <div id="portfolio-summary" class="summary-text"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>风险提醒</h2>
+          <span class="badge">Alerts</span>
+        </div>
+        <ul id="risk-alerts" class="data-list"></ul>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>数据库自选</h2>
+          <span class="badge">MySQL</span>
+        </div>
+        <form id="db-watchlist-form" class="inline-form">
+          <select id="db-watchlist-type" aria-label="数据库关注类型">
+            <option value="stock">股票</option>
+            <option value="fund">基金</option>
+          </select>
+          <input id="db-watchlist-symbol" value="000001" aria-label="数据库关注代码" />
+          <input id="db-watchlist-name" value="平安银行" aria-label="数据库关注名称" />
+          <button type="submit">写入数据库</button>
+        </form>
+        <ul id="db-watchlist-items" class="data-list"></ul>
+      </div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
